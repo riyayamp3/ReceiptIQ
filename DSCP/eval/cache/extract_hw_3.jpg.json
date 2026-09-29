@@ -1,0 +1,47 @@
+[
+ {
+  "merchant": "VISHAL PUNJABI VAISHNO BHOJANALYA",
+  "date": "2007-05-22",
+  "subtotal": null,
+  "tax": null,
+  "total": 146,
+  "payment_method": "Cash",
+  "category": "Food & Dining",
+  "confidence": {
+   "merchant": 0.9999995912841584,
+   "date": 0.9999995589269254,
+   "subtotal": 0.9990390100959055,
+   "tax": 0.9990390100959055,
+   "total": 1,
+   "payment_method": 0.999911673717352,
+   "category": 0.918304500948936
+  },
+  "items": [
+   {
+    "name": "Khichri with Buller.",
+    "qty": 1,
+    "price": 35
+   },
+   {
+    "name": "Knoya Kaju.",
+    "qty": 1,
+    "price": 50
+   },
+   {
+    "name": "Curd.",
+    "qty": 2,
+    "price": 24
+   },
+   {
+    "name": "Roti",
+    "qty": 4,
+    "price": 12
+   },
+   {
+    "name": "Rice.",
+    "qty": 1,
+    "price": 25
+   }
+  ]
+ }
+]

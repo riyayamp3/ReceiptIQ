@@ -1,0 +1,52 @@
+[
+ {
+  "merchant": "IndianOil",
+  "date": "2025-03-19",
+  "subtotal": null,
+  "tax": null,
+  "total": 1000.0,
+  "payment_method": null,
+  "category": "Travel",
+  "confidence": {
+   "merchant": 0.9999993443495079,
+   "date": 0.9999999403953623,
+   "subtotal": 0.9962339761230318,
+   "tax": 0.9962339761230318,
+   "total": 0.9999902850092117,
+   "payment_method": 0.9999998807907247,
+   "category": 1
+  },
+  "items": [
+   {
+    "name": "Petrol",
+    "qty": 9.52,
+    "price": 1000.0
+   }
+  ]
+ },
+ {
+  "merchant": "IndianOil",
+  "date": "2025-03-16",
+  "subtotal": null,
+  "tax": null,
+  "total": 1000.0,
+  "payment_method": null,
+  "category": "Travel",
+  "confidence": {
+   "merchant": 0.9999993443495079,
+   "date": 0.9999999284744547,
+   "subtotal": 0.9962339761230318,
+   "tax": 0.9962339761230318,
+   "total": 0.9999902850092117,
+   "payment_method": 0.9999998807907247,
+   "category": 1
+  },
+  "items": [
+   {
+    "name": "Petrol",
+    "qty": 9.52,
+    "price": 1000.0
+   }
+  ]
+ }
+]

@@ -1,0 +1,42 @@
+[
+ {
+  "merchant": "SHREE CHAATS MITHAI AND NAMKEEN",
+  "date": "2020-12-17",
+  "subtotal": 415.0,
+  "tax": 0.0,
+  "total": 415.0,
+  "payment_method": null,
+  "category": "Food & Dining",
+  "confidence": {
+   "merchant": 0.9999975508284907,
+   "date": 0.999999976158145,
+   "subtotal": 0.9999987602310512,
+   "tax": 0.9913475414174666,
+   "total": 0.9999987602310512,
+   "payment_method": 0.9999998807907247,
+   "category": 0.9602653396002757
+  },
+  "items": [
+   {
+    "name": "Samosa Chaat",
+    "qty": 2.0,
+    "price": 150.0
+   },
+   {
+    "name": "Mixed Chaat",
+    "qty": 1.0,
+    "price": 90.0
+   },
+   {
+    "name": "Cheese Pav Bhaji",
+    "qty": 1.0,
+    "price": 105.0
+   },
+   {
+    "name": "Dahi Bhel Puri",
+    "qty": 1.0,
+    "price": 70.0
+   }
+  ]
+ }
+]

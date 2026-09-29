@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --color-canvas: #e2ded0;
+  --color-paper: #efece3;
+  --color-sand: #e7e2d4;
+  --color-ink: #253520;
+  --color-ink-soft: #3d4d34;
+  --color-muted: #7f7c6d;
+  --color-line: #d6d0bf;
+  --color-lime: #cfd98b;
+  --color-warn: #a4561c;
+}
+
+body {
+  @apply bg-canvas font-sans text-ink antialiased;
+}
+
+.field {
+  @apply w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-ink-soft;
+}
+.btn {
+  @apply rounded-lg bg-ink px-4 py-2 text-sm text-paper transition hover:bg-ink-soft disabled:cursor-not-allowed disabled:opacity-40;
+}
+.btn-outline {
+  @apply rounded-lg border border-ink/40 px-4 py-2 text-sm transition hover:bg-sand;
+}
+.eyebrow {
+  @apply flex items-center gap-2 text-[11px] tracking-wider text-muted uppercase;
+}

@@ -1,0 +1,37 @@
+[
+ {
+  "merchant": "BHARAT ASSOCIATES",
+  "date": "2024-11-15",
+  "subtotal": 6935.0,
+  "tax": 1250.0,
+  "total": 32345.0,
+  "payment_method": null,
+  "category": "Other",
+  "confidence": {
+   "merchant": 0.9999998092652774,
+   "date": 1,
+   "subtotal": 0.9462065984012752,
+   "tax": 0.9999999006589834,
+   "total": 0.9999999148505572,
+   "payment_method": 0.9999998807907247,
+   "category": 0.9398905767100842
+  },
+  "items": [
+   {
+    "name": "STAMP PAPER VALUE",
+    "qty": 1.0,
+    "price": 21980.0
+   },
+   {
+    "name": "Notery Charges",
+    "qty": 1.0,
+    "price": 2180.0
+   },
+   {
+    "name": "SERVICE CHARGES",
+    "qty": 1.0,
+    "price": 6935.0
+   }
+  ]
+ }
+]

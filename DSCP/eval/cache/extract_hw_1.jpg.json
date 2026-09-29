@@ -1,0 +1,42 @@
+[
+ {
+  "merchant": "Varnamm",
+  "date": "2022-03-19",
+  "subtotal": 8120,
+  "tax": null,
+  "total": 8520,
+  "payment_method": null,
+  "category": "Shopping",
+  "confidence": {
+   "merchant": 0.9999999602635748,
+   "date": 0.9999999403953623,
+   "subtotal": 0.9999999403953623,
+   "tax": 0.9991386166309156,
+   "total": 1,
+   "payment_method": 0.9999998807907247,
+   "category": 0.9999998807907247
+  },
+  "items": [
+   {
+    "name": "Salwar Suits Silk Cotton",
+    "qty": 1,
+    "price": 250
+   },
+   {
+    "name": "Blouse",
+    "qty": 15,
+    "price": 6750
+   },
+   {
+    "name": "Picco & Fall",
+    "qty": 12,
+    "price": 1800
+   },
+   {
+    "name": "Blue Saree pieceing",
+    "qty": 1,
+    "price": 20
+   }
+  ]
+ }
+]

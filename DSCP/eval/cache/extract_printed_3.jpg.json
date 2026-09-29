@@ -1,0 +1,27 @@
+[
+ {
+  "merchant": "R K Associates and Hoteliers Pvt Ltd",
+  "date": "2025-01-22",
+  "subtotal": 76.19,
+  "tax": 3.8,
+  "total": 80.0,
+  "payment_method": "Cash",
+  "category": "Food & Dining",
+  "confidence": {
+   "merchant": 0.9999999552965315,
+   "date": 0.9999999523162927,
+   "subtotal": 1,
+   "tax": 1,
+   "total": 0.9993818524966378,
+   "payment_method": 0.9998976097084851,
+   "category": 0.9391912634739162
+  },
+  "items": [
+   {
+    "name": "VEG MEAL",
+    "qty": 1,
+    "price": 76.19
+   }
+  ]
+ }
+]

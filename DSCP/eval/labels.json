@@ -1,0 +1,22 @@
+{
+  "_note": "Ground truth read by hand from each image. merchant: any listed name counts. tax/items only where printed. items = line amounts.",
+  "hw_1.jpg": {"group": "handwritten", "receipts": [
+    {"merchant": ["Varnamm"], "date": "2022-03-19", "total": 8520, "items": [250, 6750, 1800, 20]}
+  ]},
+  "hw_2.jpg": {"group": "handwritten", "receipts": [
+    {"merchant": ["Bharat Associates"], "date": "2024-11-15", "total": 32345, "tax": 1250, "items": [21980, 2180, 6935]}
+  ]},
+  "hw_3.jpg": {"group": "handwritten", "receipts": [
+    {"merchant": ["Vishal Punjabi Vaishno Bhojanalya"], "date": "2007-05-22", "total": 146, "items": [35, 50, 24, 12, 25]}
+  ]},
+  "printed_1.jpg": {"group": "printed", "receipts": [
+    {"merchant": ["IndianOil", "Indian Oil"], "date": "2025-03-16", "total": 1000, "items": [1000]},
+    {"merchant": ["IndianOil", "Indian Oil"], "date": "2025-03-19", "total": 1000, "items": [1000]}
+  ]},
+  "printed_2.jpg": {"group": "printed", "receipts": [
+    {"merchant": ["Shree Chaats"], "date": "2020-12-17", "total": 415, "items": [150, 90, 105, 70]}
+  ]},
+  "printed_3.jpg": {"group": "printed", "receipts": [
+    {"merchant": ["IRCTC", "R K Associates", "RK Associates"], "date": "2025-01-22", "total": 80, "tax": 3.8, "items": [76.19]}
+  ]}
+}
