@@ -13,6 +13,7 @@ import csv
 import json
 import math
 import random
+import secrets
 import string
 from contextlib import closing
 from dataclasses import dataclass, field
@@ -255,21 +256,94 @@ def write_csv(out_dir, end=None):
 
 DEMO_PASSWORD = "demo12345"
 
+# Members of the Sharma Family demo group.
+# Each member is (name, email, budget, categories_they_own).
+# Categories not listed here fall through to the "father" (default head of household).
+SHARMA_MEMBERS = [
+    {
+        "key": "father",
+        "name": "Rajesh Sharma",
+        "email": "rajesh@demo.receiptiq.in",
+        "budget": 25000.0,
+        "categories": {"Travel", "Bills & Utilities"},  # fuel, electricity, insurance, school fees
+    },
+    {
+        "key": "mother",
+        "name": "Sunita Sharma",
+        "email": "sunita@demo.receiptiq.in",
+        "budget": 20000.0,
+        "categories": {"Groceries", "Health"},  # kirana, D-Mart, medicine, clinic
+    },
+    {
+        "key": "son",
+        "name": "Arjun Sharma",
+        "email": "arjun@demo.receiptiq.in",
+        "budget": 10000.0,
+        "categories": {"Entertainment", "Shopping"},  # DTH, clothing, electronics
+    },
+    {
+        "key": "daughter",
+        "name": "Priya Sharma",
+        "email": "priya.sharma@demo.receiptiq.in",
+        "budget": 10000.0,
+        "categories": {"Food & Dining"},  # Haldiram's, Zomato
+    },
+]
+
+# Maps a Sharma member key → list of categories they own (built once from SHARMA_MEMBERS).
+_SHARMA_CATEGORY_MAP: dict[str, set[str]] = {m["key"]: m["categories"] for m in SHARMA_MEMBERS}
+
+
+def _sharma_member_key(category: str | None) -> str:
+    """Return the SHARMA_MEMBERS key of whichever member should own this category."""
+    for key, cats in _SHARMA_CATEGORY_MAP.items():
+        if category in cats:
+            return key
+    return SHARMA_MEMBERS[0]["key"]  # default: father
+
+
+def _teardown_sharma_family(con) -> None:
+    """Remove the Sharma family group and all its member accounts idempotently."""
+    # Collect all member emails (the persona account + the 4 individual members).
+    all_emails = [p.email for p in PERSONAS if p.key == "family"] + [m["email"] for m in SHARMA_MEMBERS]
+    for email in all_emails:
+        old = con.execute("select id, family_group_id from users where email = ?", (email,)).fetchone()
+        if old:
+            con.execute("delete from receipts where user_id = ?", (old["id"],))
+            # Remove the family group if this user created it (cleanup is order-independent because
+            # ON DELETE CASCADE / SET NULL handles the foreign keys).
+            if old["family_group_id"]:
+                group_has_other_members = con.execute(
+                    "select 1 from users where family_group_id = ? and id != ?",
+                    (old["family_group_id"], old["id"]),
+                ).fetchone()
+                if not group_has_other_members:
+                    con.execute("delete from groups where id = ?", (old["family_group_id"],))
+            con.execute("delete from users where id = ?", (old["id"],))
+
 
 def load_demo_accounts(end=None):
-    """Replace the demo accounts in the app database with fresh synthetic data (labels are not stored)."""
+    """Replace the demo accounts in the app database with fresh synthetic data (labels are not stored).
+
+    For the "family" persona, four individual Sharma family members are created and share a single
+    groups row. Receipts are attributed to each member via member_id according to category.
+    Single-account personas (student, professional) are unchanged.
+    """
     from auth import hash_password
     from db import connect, migrate
 
     migrate()
     with closing(connect()) as con, con:
-        for p in PERSONAS:
+        # --- single-account personas (student, professional) ---
+        for p in [p for p in PERSONAS if p.key != "family"]:
             old = con.execute("select id from users where email = ?", (p.email,)).fetchone()
-            if old:  # receipts.user_id may lack ON DELETE CASCADE in older databases, so delete explicitly
+            if old:
                 con.execute("delete from receipts where user_id = ?", (old["id"],))
                 con.execute("delete from users where id = ?", (old["id"],))
-            uid = con.execute("insert into users (name, email, password_hash, monthly_budget) values (?, ?, ?, ?)",
-                              (p.name, p.email, hash_password(DEMO_PASSWORD), p.budget)).lastrowid
+            uid = con.execute(
+                "insert into users (name, email, password_hash, monthly_budget) values (?, ?, ?, ?)",
+                (p.name, p.email, hash_password(DEMO_PASSWORD), p.budget),
+            ).lastrowid
             txs = generate(p, end=end)
             for t in txs:
                 rid = con.execute(
@@ -277,13 +351,75 @@ def load_demo_accounts(end=None):
                                              engine, lang, cgst, sgst, igst, gst_rate, gstin, service_type, status,
                                              raw_text, field_confidence)
                        values (?, ?, ?, ?, ?, ?, ?, ?, 'synthetic', 'en', ?, ?, ?, ?, ?, ?, 'confirmed', ?, '{}')""",
-                    (uid, t["merchant"], t["date"], t["subtotal"], t["tax"], t["total"], t["payment_method"], t["category"],
-                     t["cgst"], t["sgst"], t["igst"], t["gst_rate"], t["gstin"], t["service_type"],
-                     f"Synthetic transaction {t['tx_id']}"),
+                    (uid, t["merchant"], t["date"], t["subtotal"], t["tax"], t["total"], t["payment_method"],
+                     t["category"], t["cgst"], t["sgst"], t["igst"], t["gst_rate"], t["gstin"],
+                     t["service_type"], f"Synthetic transaction {t['tx_id']}"),
                 ).lastrowid
-                con.executemany("insert into items (receipt_id, name, qty, price) values (?, ?, ?, ?)",
-                                [(rid, i["name"], i["qty"], i["price"]) for i in t["items"]])
+                con.executemany(
+                    "insert into items (receipt_id, name, qty, price) values (?, ?, ?, ?)",
+                    [(rid, i["name"], i["qty"], i["price"]) for i in t["items"]],
+                )
             print(f"{p.name:<16} {p.email:<32} {len(txs)} receipts")
+
+        # --- multi-member family persona (Sharma Family) ---
+        # Teardown: remove any existing Sharma accounts and their family group so the seeding is
+        # idempotent — running --load twice gives the same state.
+        _teardown_sharma_family(con)
+
+        # Create the shared family group.
+        join_code = secrets.token_urlsafe(4)
+        family_p = next(p for p in PERSONAS if p.key == "family")
+        fgid = con.execute(
+            "insert into groups (name, join_code, created_by) values (?, ?, NULL)",
+            ("Sharma Family", join_code),
+        ).lastrowid
+
+        # Create each member user inside that family group.
+        member_ids: dict[str, int] = {}
+        for m in SHARMA_MEMBERS:
+            uid = con.execute(
+                "insert into users (name, email, password_hash, monthly_budget, family_group_id) values (?, ?, ?, ?, ?)",
+                (m["name"], m["email"], hash_password(DEMO_PASSWORD), m["budget"], fgid),
+            ).lastrowid
+            member_ids[m["key"]] = uid
+
+        # Update the family group's created_by to point to the father (head of household).
+        con.execute(
+            "update groups set created_by = ? where id = ?",
+            (member_ids["father"], fgid),
+        )
+
+        # Generate the family persona's receipts and distribute them to members by category.
+        txs = generate(family_p, end=end)
+        member_counts: dict[str, int] = {k: 0 for k in member_ids}
+        for t in txs:
+            owner_key = _sharma_member_key(t["category"])
+            owner_uid = member_ids[owner_key]
+            rid = con.execute(
+                """insert into receipts (user_id, member_id, family_group_id,
+                                         merchant, date, subtotal, tax, total, payment_method, category,
+                                         engine, lang, cgst, sgst, igst, gst_rate, gstin, service_type, status,
+                                         raw_text, field_confidence)
+                   values (?, ?, ?,
+                           ?, ?, ?, ?, ?, ?, ?,
+                           'synthetic', 'en', ?, ?, ?, ?, ?, ?, 'confirmed', ?, '{}')""",
+                (
+                    owner_uid, owner_uid, fgid,
+                    t["merchant"], t["date"], t["subtotal"], t["tax"], t["total"], t["payment_method"],
+                    t["category"], t["cgst"], t["sgst"], t["igst"], t["gst_rate"], t["gstin"],
+                    t["service_type"], f"Synthetic transaction {t['tx_id']}",
+                ),
+            ).lastrowid
+            con.executemany(
+                "insert into items (receipt_id, name, qty, price) values (?, ?, ?, ?)",
+                [(rid, i["name"], i["qty"], i["price"]) for i in t["items"]],
+            )
+            member_counts[owner_key] += 1
+
+        for m in SHARMA_MEMBERS:
+            print(f"  {m['name']:<18} {m['email']:<36} {member_counts[m['key']]} receipts")
+        print(f"Sharma Family (family_group_id={fgid}, join_code={join_code}) — {len(txs)} receipts total")
+
     print(f"password for all demo accounts: {DEMO_PASSWORD}")
 
 

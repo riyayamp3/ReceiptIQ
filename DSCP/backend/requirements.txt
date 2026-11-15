@@ -7,3 +7,7 @@ pillow
 easyocr
 opencv-python-headless
 numpy
+sqlite-vec
+groq
+pdfplumber
+requests

@@ -6,8 +6,10 @@ import Review from "./Review";
 import Dashboard from "./Dashboard";
 import Explore from "./Explore";
 import Profile from "./Profile";
+import Chat from "./Chat";
 
-const TABS = [["upload", "Upload"], ["review", "Review"], ["dashboard", "Dashboard"], ["explore", "Explore"]];
+const TABS = [["upload", "Upload"], ["review", "Review"], ["dashboard", "Dashboard"], ["explore", "Explore"],
+  ["chat", "Chat"]];
 const PAGES = new Set([...TABS.map(([p]) => p), "profile"]);
 
 // the page lives in the URL hash (#/explore?category=Groceries): back button and bookmarks work, no router needed
@@ -25,9 +27,13 @@ export default function App() {
   const [me, setMe] = useState(undefined); // undefined = checking session, null = logged out
   const [route, setRoute] = useState(readRoute);
   const [receipts, setReceipts] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [activeGroup, setActiveGroup] = useState(null);
 
   useEffect(() => {
     api("/me").then(setMe).catch(() => setMe(null));
+    api("/groups").then(setGroups).catch(() => {});
+    api("/groups/active").then(setActiveGroup).catch(() => {});
     const onLoggedOut = () => setMe(null);
     const onHash = () => (setRoute(readRoute()), window.scrollTo(0, 0));
     window.addEventListener("logged-out", onLoggedOut);
@@ -44,6 +50,13 @@ export default function App() {
     await api("/auth/logout", { method: "POST" }).catch(() => {});
     setMe(null);
     go("upload");
+  }
+
+  async function switchGroup(gid) {
+    try {
+      await api("/groups/active", { method: "PUT", json: { group_id: gid } });
+      window.location.reload();
+    } catch {}
   }
 
   const { page, params } = route;
@@ -74,6 +87,13 @@ export default function App() {
                   </a>
                 ))}
               </nav>
+              {groups.length > 1 && (
+                <select className="rounded-full border border-line bg-paper px-3 py-1 text-sm" value={activeGroup?.id ?? ""} onChange={(e) => switchGroup(Number(e.target.value))}>
+                  {groups.map((g) => (
+                    <option key={g.id} value={g.id}>{g.name}</option>
+                  ))}
+                </select>
+              )}
               <a
                 href="#/profile"
                 className={`flex items-center gap-2 rounded-full py-1 pr-1 pl-1 text-sm transition sm:pl-3 ${page === "profile" ? "bg-sand" : "hover:bg-sand"}`}
@@ -92,9 +112,10 @@ export default function App() {
           {me && page === "upload" && (
             <Upload onUploaded={(found) => setReceipts((rs) => [...found, ...rs])} onReview={() => go("review")} pending={pending} />
           )}
-          {me && page === "review" && <Review receipts={receipts} setReceipts={setReceipts} />}
+          {me && page === "review" && <Review receipts={receipts} setReceipts={setReceipts} me={me} />}
           {me && page === "dashboard" && <Dashboard me={me} go={go} />}
           {me && page === "explore" && <Explore params={params} go={go} />}
+          {me && page === "chat" && <Chat me={me} />}
           {me && page === "profile" && <Profile me={me} onSaved={setMe} onLogout={logout} />}
         </main>
       </div>

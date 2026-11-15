@@ -1,0 +1,266 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Add vector-store and LLM dependencies to `backend/requirements.txt`": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534046
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730548883
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730640111
+      }
+    ],
+    "1.2 Extend `db.py` schema, `connect()`, and constants for family groups + embeddings": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534089
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730649671
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731067572
+      }
+    ],
+    "1.3 Implement `migrate()` backfill and create the `receipt_embeddings` vec0 table": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534127
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731072174
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731306884
+      }
+    ],
+    "2.1 Create `embeddings.py` (Sarvam EmbeddingGemma 2)": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534234
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730549237
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730640799
+      }
+    ],
+    "2.2 Create `vectorstore.py` (sqlite-vec operations)": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534297
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731072620
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731307384
+      }
+    ],
+    "3.1 Create `family.py` (APIRouter prefix `/api/family`)": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534334
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731073141
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731307854
+      }
+    ],
+    "4.1 Extend `analysis.py` scoping from `user_id` to family group": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534387
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731073551
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731308454
+      }
+    ],
+    "4.2 Re-scope `app.py` read endpoints to family group with optional member filter": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534426
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731323262
+      }
+    ],
+    "4.3 Add embedding hooks and member-label assignment in `app.py`": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534463
+      }
+    ],
+    "5.1 Create `chat.py` (dual-provider selection/fallback, scope resolution, tools, chat loop)": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534497
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731323696
+      }
+    ],
+    "5.2 Add the `/api/chat` endpoint, `/api/providers` endpoint, and include the family router in `app.py`": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534535
+      }
+    ],
+    "6. Checkpoint — backend layer complete": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534589
+      }
+    ],
+    "7.1 Create `MemberFilter.jsx` (shared component)": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534725
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730549159
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730641282
+      }
+    ],
+    "7.2 Create `Chat.jsx` (chat UI with provider selector)": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534760
+      }
+    ],
+    "7.3 Add the Chat tab in `App.jsx`": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534795
+      }
+    ],
+    "8.1 Add the member label dropdown to `Review.jsx`": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534836
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731323980
+      }
+    ],
+    "8.2 Add the member filter to `Dashboard.jsx`": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534887
+      }
+    ],
+    "8.3 Add the member filter to `Explore.jsx`": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534935
+      }
+    ],
+    "9.1 Enhance `synth.py` to optionally seed multi-member family groups": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730534983
+      },
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731324331
+      }
+    ],
+    "10. Final checkpoint — all tests pass": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794730535026
+      }
+    ],
+    "1. Backend database foundation and migration": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731306987
+      }
+    ],
+    "2. Embeddings and vector store": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731307423
+      }
+    ],
+    "3. Family group API": [
+      {
+        "executionId": "f7095c64-747d-418a-9eab-c2f441984c25",
+        "chatSessionId": "sess_2dd26686-a119-4de3-9ff0-3028113f7fac",
+        "timestamp": 1794731307889
+      }
+    ]
+  }
+}

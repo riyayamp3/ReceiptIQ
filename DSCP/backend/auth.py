@@ -31,7 +31,7 @@ def token_hash(token):
 
 
 def public(user):
-    return {k: user[k] for k in ("id", "name", "email", "monthly_budget")}
+    return {k: user[k] for k in ("id", "name", "email", "monthly_budget", "active_group_id")}
 
 
 def current_user(session: str | None = Cookie(default=None)):

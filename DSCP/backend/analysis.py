@@ -59,10 +59,13 @@ def typical(bills, history=None):
     return keep, len(rest) - len(keep), monthly & {b.get("merchant") for b in bills}
 
 
-def analysis(con, uid, category=None, merchant=None, month=None, today=None):
+def analysis(con, fgid, category=None, merchant=None, month=None, today=None, member_filter=None):
     today = today or date.today()
-    base = "from receipts where user_id = ? and status = 'confirmed' and total is not null and date is not null"
-    where, args = base, [uid]
+    base = "from receipts where family_group_id = ? and status = 'confirmed' and total is not null and date is not null"
+    where, args = base, [fgid]
+    if member_filter is not None:
+        where += " and member_id = ?"
+        args.append(member_filter)
     for col, val in (("category", category), ("merchant", merchant)):
         if val:
             where += f" and {col} = ?"
@@ -76,9 +79,11 @@ def analysis(con, uid, category=None, merchant=None, month=None, today=None):
           f"coalesce(sum(tax), 0) as tax, min(date) as first, max(date) as last {where}")[0]
     if not s["count"]:
         return {"summary": s}
-    # share of the same period's spending, ignoring the category/merchant filter
-    period = [uid] + ([month] if month else [])
-    whole = con.execute(f"select coalesce(sum(total), 0) {base}" + (" and substr(date, 1, 7) = ?" if month else ""), period).fetchone()[0]
+    # share of the same period's spending — denominator is family-wide (not member-filtered),
+    # so individual member share is relative to the whole family
+    family_base = "from receipts where family_group_id = ? and status = 'confirmed' and total is not null and date is not null"
+    period = [fgid] + ([month] if month else [])
+    whole = con.execute(f"select coalesce(sum(total), 0) {family_base}" + (" and substr(date, 1, 7) = ?" if month else ""), period).fetchone()[0]
     s["share"] = s["total"] / whole * 100 if whole else None
 
     out = {"summary": s}
@@ -118,22 +123,29 @@ def analysis(con, uid, category=None, merchant=None, month=None, today=None):
     out["typical_by_month"] = dict(sorted(by_month.items()))
 
     if month and not merchant:  # what moved vs the previous month, by category (or by merchant inside a category)
-        out["changes"] = changes(con, uid, month, category, today)
+        out["changes"] = changes(con, fgid, month, category, today, member_filter)
     out["receipts"] = q(f"select id, date, merchant, category, total, tax {where} order by date desc, id desc limit 100")
     out["insights"] = slice_insights(out, category, merchant, month, today)
     return out
 
 
-def changes(con, uid, month, category, today):
+def changes(con, fgid, month, category, today, member_filter=None):
     """Per-group spend this month vs last. While the month is running, compare the same days of both."""
     dim = "merchant" if category else "coalesce(category, 'Other')"
     cutoff = today.day if month == today.strftime("%Y-%m") else 31
     sql = f"""select {dim} as name, sum(total) as total from receipts
-              where user_id = ? and status = 'confirmed' and total is not null and substr(date, 1, 7) = ?
-              and cast(substr(date, 9, 2) as integer) <= ? {"and category = ?" if category else ""} group by 1"""
-    extra = [category] if category else []
-    now = {r["name"]: r["total"] for r in con.execute(sql, [uid, month, cutoff, *extra])}
-    before = {r["name"]: r["total"] for r in con.execute(sql, [uid, prev_month(month), cutoff, *extra])}
+              where family_group_id = ? and status = 'confirmed' and total is not null and substr(date, 1, 7) = ?
+              and cast(substr(date, 9, 2) as integer) <= ?"""
+    extra = []
+    if member_filter is not None:
+        sql += " and member_id = ?"
+        extra.append(member_filter)
+    if category:
+        sql += " and category = ?"
+        extra.append(category)
+    sql += " group by 1"
+    now = {r["name"]: r["total"] for r in con.execute(sql, [fgid, month, cutoff, *extra])}
+    before = {r["name"]: r["total"] for r in con.execute(sql, [fgid, prev_month(month), cutoff, *extra])}
     rows = [{"name": k, "now": now.get(k, 0), "before": before.get(k, 0), "delta": now.get(k, 0) - before.get(k, 0)}
             for k in set(now) | set(before)]
     rows.sort(key=lambda r: abs(r["delta"]), reverse=True)
@@ -192,14 +204,16 @@ if __name__ == "__main__":
 
     con = sqlite3.connect(":memory:")
     con.row_factory = sqlite3.Row
-    con.executescript("""create table receipts (id integer primary key, user_id int, status text, date text, merchant text,
+    con.executescript("""create table receipts (id integer primary key, user_id int, family_group_id int,
+                         member_id int, status text, date text, merchant text,
                          category text, total real, tax real, payment_method text);
                          create table items (receipt_id int, name text, qty real, price real);""")
-    rows = [(1, "2026-08-01", "Chai", "Food", 20), (1, "2026-08-02", "Chai", "Food", 20), (1, "2026-08-08", "Chai", "Food", 20),
-            (1, "2026-08-20", "Mall", "Shopping", 1000), (1, "2026-09-05", "Chai", "Food", 20), (1, "2026-09-06", "Mall", "Shopping", 3000),
-            (2, "2026-09-06", "Secret", "Food", 99999)]  # another user's data must never leak in
-    for i, (u, d, m, c, t) in enumerate(rows):
-        con.execute("insert into receipts values (?, ?, 'confirmed', ?, ?, ?, ?, 0, 'UPI')", (i + 1, u, d, m, c, t))
+    rows = [(1, 1, "2026-08-01", "Chai", "Food", 20), (1, 1, "2026-08-02", "Chai", "Food", 20),
+            (1, 1, "2026-08-08", "Chai", "Food", 20), (1, 1, "2026-08-20", "Mall", "Shopping", 1000),
+            (1, 1, "2026-09-05", "Chai", "Food", 20), (1, 1, "2026-09-06", "Mall", "Shopping", 3000),
+            (2, 2, "2026-09-06", "Secret", "Food", 99999)]  # another family's data must never leak in
+    for i, (u, fg, d, m, c, t) in enumerate(rows):
+        con.execute("insert into receipts values (?, ?, ?, ?, 'confirmed', ?, ?, ?, ?, 0, 'UPI')", (i + 1, u, fg, u, d, m, c, t))
         con.execute("insert into items values (?, ?, 1, ?)", (i + 1, "Cutting chai" if m == "Chai" else "Jeans", t))
     today = date(2026, 9, 10)
 
@@ -218,6 +232,14 @@ if __name__ == "__main__":
     top = sep["changes"]["rows"][0]  # Aug 1-10 had no Shopping (Mall was the 20th), so +3000
     assert (top["name"], top["before"], top["now"]) == ("Shopping", 0, 3000) and sep["changes"]["through_day"] == 10, sep["changes"]
     assert analysis(con, 1, merchant="Nobody", today=today) == {"summary": {"count": 0, "total": 0, "avg": 0, "tax": 0, "first": None, "last": None}}
+
+    # member_filter: only user 1 receipts in family group 1
+    mf = analysis(con, 1, today=today, member_filter=1)
+    assert mf["summary"]["count"] == 6 and mf["summary"]["total"] == 4080, mf["summary"]
+    # member_filter with a member who has no receipts in this family
+    mf_empty = analysis(con, 1, today=today, member_filter=99)
+    assert mf_empty["summary"]["count"] == 0, mf_empty
+
     spiky = [{"date": f"2026-08-{d:02d}", "total": t, "merchant": "Cafe"} for d, t in enumerate([15, 20, 25, 30, 35, 40, 45, 50, 60, 80, 100, 120, 140, 450, 380, 64888], 1)]
     kept, dropped, _ = typical(spiky)
     assert dropped == 1 and max(b["total"] for b in kept) == 450, (kept, dropped)  # skewed but normal bills stay

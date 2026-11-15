@@ -1,0 +1,43 @@
+{
+  "answer": "\nYou\u2019ve spent **\u20b912,04,394** in total across **1,422 transactions** from April 2025 to November 2026. That works out to an average of about **\u20b9847 per transaction**.",
+  "member": {
+    "id": 19,
+    "name": "Aarav Kulkarni"
+  },
+  "family_group_id": 16,
+  "receipts": [
+    {
+      "id": 11979,
+      "date": "2026-11-15",
+      "merchant": "Swiggy",
+      "category": "Food & Dining",
+      "total": 798.0,
+      "tax": 38.0
+    },
+    {
+      "id": 11978,
+      "date": "2026-11-15",
+      "merchant": "Swiggy",
+      "category": "Food & Dining",
+      "total": 798.0,
+      "tax": 38.0
+    },
+    {
+      "id": 11977,
+      "date": "2026-11-15",
+      "merchant": "College Canteen",
+      "category": "Food & Dining",
+      "total": 160.0,
+      "tax": 0.0
+    },
+    {
+      "id": 11976,
+      "date": "2026-11-14",
+      "merchant": "Rapido",
+      "category": "Travel",
+      "total": 84.0,
+      "tax": 4.0
+    },
+    {
+      "id": 11975,
+      "date": "2026-11

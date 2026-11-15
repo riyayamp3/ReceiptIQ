@@ -5,14 +5,16 @@ const PAYMENTS = ["UPI", "Card", "Cash", "Other"];
 const PAGE = 30; // demo accounts have 1000+ receipts: render a page at a time
 const num = (v) => (v === "" || v == null ? null : Number(v));
 
-export default function Review({ receipts, setReceipts }) {
+export default function Review({ receipts, setReceipts, me }) {
   const [show, setShow] = useState("pending");
   const [limit, setLimit] = useState(PAGE);
   const [categories, setCategories] = useState([]);
   const [services, setServices] = useState([]);
+  const [roster, setRoster] = useState([]);
   useEffect(() => {
     api("/categories").then(setCategories);
     api("/service-types").then(setServices);
+    api("/groups/roster").then(setRoster).catch(() => setRoster(me ? [me] : []));
   }, []);
 
   const list = receipts.filter((r) => r.status === show);
@@ -44,7 +46,7 @@ export default function Review({ receipts, setReceipts }) {
       )}
       <div className="mt-6 space-y-5">
         {list.slice(0, limit).map((r) => (
-          <ReceiptCard key={r.id} receipt={r} categories={categories} services={services} onSaved={replace} onDeleted={remove} />
+          <ReceiptCard key={r.id} receipt={r} categories={categories} services={services} roster={roster} me={me} onSaved={replace} onDeleted={remove} />
         ))}
       </div>
       {list.length > limit && (
@@ -58,7 +60,7 @@ export default function Review({ receipts, setReceipts }) {
   );
 }
 
-function ReceiptCard({ receipt, categories, services, onSaved, onDeleted }) {
+function ReceiptCard({ receipt, categories, services, roster, me, onSaved, onDeleted }) {
   const [r, setR] = useState(receipt);
   const [error, setError] = useState(null);
   const set = (k) => (e) => setR({ ...r, [k]: e.target.value });
@@ -75,6 +77,7 @@ function ReceiptCard({ receipt, categories, services, onSaved, onDeleted }) {
       const body = {
         ...r,
         status,
+        member: num(r.member) ?? (me ? me.id : null),
         subtotal: num(r.subtotal),
         tax: num(r.tax),
         total: num(r.total),
@@ -132,6 +135,17 @@ function ReceiptCard({ receipt, categories, services, onSaved, onDeleted }) {
               {PAYMENTS.map((p) => <option key={p}>{p}</option>)}
             </select>
           </Field>
+          {roster.length > 0 && (
+            <Field label="Spent by">
+              <select className="field" value={r.member ?? (me ? me.id : "")} onChange={set("member")}>
+                {roster.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}{me && m.id === me.id ? " (you)" : ""}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )}
         </div>
 
         <div>

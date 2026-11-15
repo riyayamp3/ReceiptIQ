@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { api, inr, monthLabel } from "./api";
 import { BarList, Columns, Diverging, Insights, Panel, Tile } from "./charts";
+import { MemberFilter } from "./MemberFilter";
 
 const fullMonth = (ym) => new Date(`${ym}-01T00:00`).toLocaleString("en-IN", { month: "long", year: "numeric" });
 
@@ -8,21 +9,28 @@ export default function Explore({ params, go }) {
   const { category, merchant, month } = params;
   const [a, setA] = useState(null);
   const [error, setError] = useState(null);
-  const [day, setDay] = useState(null); // clicking a day filters the transaction list
+  const [day, setDay] = useState(null);
+  const [member, setMember] = useState(null); // null = whole family
+  const [roster, setRoster] = useState([]);
+
+  useEffect(() => {
+    api("/groups/roster").then(setRoster).catch(() => {});
+  }, []);
 
   useEffect(() => {
     setA(null);
     setDay(null);
     setError(null);
-    const q = new URLSearchParams(Object.entries({ category, merchant, month }).filter(([, v]) => v));
+    const q = new URLSearchParams(
+      Object.entries({ category, merchant, month, member }).filter(([, v]) => v != null && v !== "")
+    );
     api(`/analysis?${q}`).then(setA).catch((e) => setError(e.message));
-  }, [category, merchant, month]);
+  }, [category, merchant, month, member]);
 
-  // drilling keeps the other filters; a merchant implies its category, so that filter becomes redundant
   const drill = (patch) => go("explore", { ...params, ...patch });
   const without = (key) => go("explore", { ...params, [key]: undefined });
 
-  const title = merchant ?? category ?? (month ? fullMonth(month) : "All your spending");
+  const title = merchant ?? category ?? (month ? fullMonth(month) : "All spending");
   const chips = [
     category && ["category", category],
     merchant && ["merchant", merchant],
@@ -33,22 +41,30 @@ export default function Explore({ params, go }) {
     <div className="space-y-6">
       <div>
         <nav aria-label="Filters" className="flex flex-wrap items-center gap-2 text-sm">
-          <button className="eyebrow hover:text-ink" onClick={() => go("explore", {})}>◈ Explore</button>
+          <button className="eyebrow hover:text-ink" onClick={() => go("explore", {})}>Explore</button>
           {chips.map(([key, label]) => (
             <span key={key} className="flex items-center gap-1 rounded-full bg-sand py-0.5 pr-1 pl-3">
               {label}
               <button aria-label={`Remove ${key} filter`} className="grid size-5 place-items-center rounded-full hover:bg-paper" onClick={() => without(key)}>
-                ✕
+                x
               </button>
             </span>
           ))}
         </nav>
-        <h2 className="mt-2 text-3xl font-normal tracking-tight">{title}</h2>
+        <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
+          <h2 className="text-3xl font-normal tracking-tight">{title}</h2>
+          {roster.length > 1 && (
+            <label className="flex items-center gap-2 text-sm">
+              <span className="text-muted">Member</span>
+              <MemberFilter roster={roster} value={member} onChange={setMember} me={null} />
+            </label>
+          )}
+        </div>
         {month && !merchant && category && <p className="mt-1 text-sm text-muted">in {fullMonth(month)}</p>}
       </div>
 
-      {error && <p className="text-warn">✕ {error}</p>}
-      {!a && !error && <p className="text-muted">Loading…</p>}
+      {error && <p className="text-warn">x {error}</p>}
+      {!a && !error && <p className="text-muted">Loading...</p>}
       {a && a.summary.count === 0 && (
         <p className="rounded-2xl bg-sand p-10 text-center text-muted">No confirmed receipts match these filters.</p>
       )}
@@ -67,7 +83,7 @@ function Body({ a, params, drill, day, setDay }) {
     <>
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Tile label="Spent" value={inr(s.total)} sub={s.share != null && s.share < 99.5 ? `${s.share.toFixed(1)}% of ${month ? "the month" : "all spending"}` : null} />
-        <Tile label="Bills" value={s.count.toLocaleString("en-IN")} sub={`${s.first} → ${s.last}`} />
+        <Tile label="Bills" value={s.count.toLocaleString("en-IN")} sub={`${s.first} to ${s.last}`} />
         <Tile label="Average bill" value={inr(s.avg)} />
         <Tile label="GST paid" value={inr(s.tax)} sub={s.total ? `${((s.tax / s.total) * 100).toFixed(1)}% of spend` : null} />
       </section>
@@ -109,7 +125,7 @@ function Body({ a, params, drill, day, setDay }) {
         {a.changes && a.changes.rows.length > 0 && (
           <Panel
             title={`What changed vs ${monthLabel(a.changes.prev_month)}`}
-            hint={a.changes.through_day ? `Days 1–${a.changes.through_day} of both months` : "Whole months"}
+            hint={a.changes.through_day ? `Days 1-${a.changes.through_day} of both months` : "Whole months"}
           >
             <Diverging
               rows={a.changes.rows.map((r) => ({ key: r.name, label: r.name, ...r }))}
@@ -120,7 +136,7 @@ function Body({ a, params, drill, day, setDay }) {
         {a.by_merchant && (
           <Panel title="Merchants" hint="Click to explore">
             <BarList
-              rows={a.by_merchant.map((m) => ({ key: m.name, label: m.name, value: m.total, sub: `${m.visits}×` }))}
+              rows={a.by_merchant.map((m) => ({ key: m.name, label: m.name, value: m.total, sub: `${m.visits}x` }))}
               onSelect={(r) => drill({ merchant: r.key })}
             />
           </Panel>
