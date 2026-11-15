@@ -1,6 +1,6 @@
 # ReceiptIQ
 
-Receipt photos → OCR → structured expenses → analytics → (soon) AI assistant.
+Receipt photos → OCR → structured expenses → analytics → groups, AI chat.
 
 ## Run
 
@@ -94,6 +94,6 @@ Self-checks: `python backend/extract.py`, `python backend/sarvam.py`, `python ba
 - [x] GST understanding (breakdown, service type, date-aware rate checks); photos stored in the database
 - [x] User accounts, profile + monthly budget, personal insights
 - [x] Explore: clickable drill-down analysis by category / merchant / month
-- [ ] Bank statement PDF import
-- [ ] Part 3: anomaly detection, weekly forecasting, insights
-- [ ] Part 4: assistant (Sarvam chat + tool calling + embeddings, Saaras voice input)
+- [x] Bank statement PDF import (passbook parser)
+- [x] Part 3: personal insights, month-over-month comparison, weekday patterns, trend detection
+- [x] Part 4: AI assistant (Sarvam/Groq chat + tool calling + embeddings, dual-provider fallback)
