@@ -399,3 +399,15 @@ def chat(body: ChatIn, user=User):
         member_filter=body.member_id,
         preferred_provider=body.provider,
     )
+
+
+# ---------------------------------------------------------------------------
+# Serve the built frontend (for production / Render deployment)
+# The frontend is built by 'npm run build' into ../frontend/dist/
+# This mount must come AFTER all /api/* routes so API takes priority.
+# ---------------------------------------------------------------------------
+from fastapi.staticfiles import StaticFiles
+
+_frontend = ROOT.parent / 'frontend' / 'dist'
+if _frontend.is_dir():
+    app.mount('/', StaticFiles(directory=str(_frontend), html=True), name='frontend')

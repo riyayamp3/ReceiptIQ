@@ -158,11 +158,14 @@ def migrate():
             f.unlink()
         old.rmdir()
 
-    with closing(connect()) as con:
-        con.execute("""
-            create virtual table if not exists receipt_embeddings using vec0(
-                receipt_id      integer primary key,
-                family_group_id integer partition key,
-                embedding       float[768]
-            )
-        """)
+    try:
+        with closing(connect()) as con:
+            con.execute("""
+                create virtual table if not exists receipt_embeddings using vec0(
+                    receipt_id      integer primary key,
+                    family_group_id integer partition key,
+                    embedding       float[768]
+                )
+            """)
+    except Exception:
+        pass
