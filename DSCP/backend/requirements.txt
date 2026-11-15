@@ -1,12 +1,9 @@
-fastapi
+﻿fastapi
 uvicorn
 python-multipart
 python-dotenv
 sarvamai
 pillow
-easyocr
-opencv-python-headless
-numpy
 sqlite-vec
 groq
 pdfplumber

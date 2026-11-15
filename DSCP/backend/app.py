@@ -23,7 +23,7 @@ import vectorstore
 from db import ROOT, connect, image_mime, migrate
 from extract import extract
 from insights import budget_status, compare_months, insights
-from ocr import run_ocr
+# run_ocr is imported lazily — EasyOCR is heavy and only needed as an offline fallback
 from passbook import parse_pdf
 
 load_dotenv(ROOT / ".env")
@@ -183,7 +183,11 @@ def read_receipts(path):
             key = [r["confidence"][k] for k in ("merchant", "date", "total") if k in r["confidence"]]
             r["ocr_confidence"] = min(key) if key else None
         return receipts, json.dumps(raw, ensure_ascii=False, indent=1), "sarvam", sarvam.detect_language(names)
-    lines, confidence = run_ocr(path)
+    try:
+        from ocr import run_ocr
+        lines, confidence = run_ocr(path)
+    except Exception:
+        raise HTTPException(502, "OCR failed: set SARVAM_API_KEY to use Sarvam Vision")
     return [{**extract(lines), "ocr_confidence": confidence, "confidence": {}}], "\n".join(lines), "easyocr", "en"
 
 

@@ -1,9 +1,14 @@
 """Offline baseline OCR: image preprocessing + EasyOCR. Returns receipt text as lines, top to bottom."""
 from functools import cache
 
-import cv2
-import easyocr
-import numpy as np
+try:
+    import cv2
+    import easyocr
+    import numpy as np
+except ImportError:
+    cv2 = None
+    easyocr = None
+    np = None
 
 @cache  # model load takes a few seconds, do it once. English only: Indic/handwritten receipts go to Sarvam
 def reader():
@@ -42,6 +47,8 @@ def group_lines(results):
 
 
 def run_ocr(path):
+    if easyocr is None:
+        raise RuntimeError("EasyOCR not installed; set SARVAM_API_KEY")
     results = reader().readtext(preprocess(path))
     if not results:
         return [], 0.0
